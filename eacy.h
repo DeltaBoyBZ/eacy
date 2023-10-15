@@ -50,6 +50,24 @@
         return;\
     }
 
+#define EAC_STATIC_FUNC(fhandle, ret, arg_names) \
+    {\
+        EAC_LIB_INIT;\
+        if(!func) func = dlsym(EACGet(lib_index), EAC_STR(fhandle##_export));\
+        EAC_LIB_MAYBE_RELOAD(EAC_STR(fhandle##_export));\
+        ret res = ((typeof(&fhandle))func)(arg_names);\
+        return res;\
+    }
+
+#define EAC_STATIC_VOID_FUNC(fhandle, arg_names) \
+    {\
+        EAC_LIB_INIT;\
+        if(!func) func = dlsym(EACGet(lib_index), EAC_STR(fhandle##_export));\
+        EAC_LIB_MAYBE_RELOAD(EAC_STR(fhandle##_export));\
+        ((typeof(&fhandle))func)(arg_names);\
+        return;\
+    }
+
 #define EAC_METHOD(cname, fname, ret, arg_names) \
     {\
         EAC_LIB_INIT;\
@@ -71,6 +89,8 @@
 #else
 #define EAC_FUNC(fname, ret, arg_names)
 #define EAC_VOID_FUNC(fname, arg_names) 
+#define EAC_STATIC_FUNC(fname, ret, arg_names)
+#define EAC_STATIC_VOID_FUNC(fname, arg_names) 
 #define EAC_METHOD(cname, fname, ret, arg_names) 
 #define EAC_VOID_METHOD(cname, fname, arg_names) 
 #endif
