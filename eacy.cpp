@@ -247,8 +247,7 @@ void process_source(const char* source_filename)
 
         std::vector<size_t> commas; 
         find_all_on_level(source, ",", commas, args_open + 1); 
-        if(!commas.empty())
-            commas.push_back(args_close); 
+        commas.push_back(args_close); 
 
         std::stringstream arg_names_stream; 
         for(size_t comma : commas)
@@ -271,6 +270,10 @@ void process_source(const char* source_filename)
             arg_names_stream << arg_name;
         }
         std::string arg_names_str = arg_names_stream.str();
+        if(arg_names_str.find_first_not_of(" \t\n\r") == std::string::npos)
+        {
+            arg_names_str.assign("");
+        }
 
         if(!arg_names_str.empty())
             eac_prop |= EACY_HAS_ARGS;
