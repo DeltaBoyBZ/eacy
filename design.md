@@ -138,36 +138,80 @@ EAC with:
 
 The  method  then  behaves  like  any  other  EAC  function.
 
+For virtual functions, the current recommended  workflow  is
+to  factor  out  the  desired  EAC  components  into   other
+functions, and mark *those* functions as EAC. 
+
+### Building Components 
+
+In order to make use of EAC, the core program must:
+
+- Be compiled with definition `-DEAC_DEBUG`
+- Be linked with `libeacyload.so`
+
+It is intended that the program will always be run from  the
+project root directory.  EAC shared  libraries  live  inside
+a subdirectory `.eac`.  When the use builds an EAC component
+e.g.   `libfoo.so`,  they  should  ensure  the   output   is
+`.eac/libfoo.so`.
+
+During a debugging session, a set of  directories  `.eac.1`,
+`.eac.2`, `...` are created  by  debug  scripts.   The  user
+should not need to interact with these. 
+
+### The GDB Session 
+
+By default, all EAC functions  make  use  of  components  in
+`.eac`.  These are the components as they were upon  program
+execution. 
+
+During program runtime, the user may edit the source code in
+EAC functions, then rebuild the corresponding component.
+Then, at the GDB console:
+
+    <C-c> # or otherwise interrupt execution
+    (gdb) eacreload
+    (gdb) continue
+
+If done correctly the user should see their code changes
+reflected. 
+
+The `eacreload` command increments the *revision counter* by
+one, which implicitly flags all components  to  reload  when
+they  are  needed.   The  `.eac`  directory  is  copied   to
+`.eac.<revision_counter>`  and  it  is  files  in  this  new
+directory which are now used. 
+
 ## Evaluation
 
-The most glaring issue with EAC-y as it stands is:  *Why  so
-many arguments in the macros?* Indeed, In most instances, we
-will   be   providing   redundant   information   e.g.
-the return  type  of  the  function  we  are  currently  in.
-Unfortunately,  the  C   preprocessor   has   a   fair   few
-limitations  when  it  comes  to  programatically   deducing
-features such as this.  The macros  in  their  current  form
-are,  as  far   as   I   cam   currently   aware,   minimal.
+The biggest limitation to EAC-y is the lack of support for
+virtual functions. 
+
+### TODO complete explanation as to why
+
+With regard to workflow,  one  question  is:  *Why  so  many
+arguments in the macros?* Indeed, In most instances, we will
+be   providing   redundant   information   e.g.    the
+return   type   of   the   function.    Unfortunately,   the
+C   preprocessor   has   a   fair   few   limitations   when
+it  comes  to  programmatically  deducing  features  such  as
+this.   The  macros  in  their  current  form  are,  as  far
+as   I   cam   currently   aware,   minimal.
 
 The arguable  clunkiness  of  the  macro-based  workflow  is
 mitigated through the use of the `eacy`  parser.   The  user
-need only mark their funtions or methods with `EAC` and  the
+need only mark their functions or methods with `EAC` and  the
 parser   inserts   the   necessary   macro    code.     Some
 might say this is still  awkward,  however  it  is  easy  to
 write a plugin for an extensible text  editor  such  as  Vim
 or  Emacs  which  should   make   this   process   smoother.
 
-The   second   potential    improvement    would    be    in
-the implementation of EAC  class  methods.   Entire  classes
+Another   potential   improvement   would    be    in    the
+implementation  of  EAC  class  methods.    Entire   classes
 *can* be dynamically  loaded  by  implementing  creator  and
 destructor  interfaces  as  `extern  "C"`   functions.    To
 utilise this in any meaningful  way  however,  EAC  funtions
 will have to be  declared  as  virtual,  which  is  a  great
 restrition.    We   considered   it   more   straightforward
 therefore    to    require    the    `EAC_EXPORT`    macros.
-
-
-
-
-
 

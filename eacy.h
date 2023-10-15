@@ -2,76 +2,71 @@
 
 /**
  * Copyright 2023 Matthew Peter Smith
- *
  * This code is provided under an MIT License. 
  * See LICENSE.txt at the root of this Git repository. 
  */
 
 #include<dlfcn.h>
-#include<stdio.h>
-#include<stdbool.h>
+
+#include"load.h"
 
 #ifdef __cplusplus
 #include<iostream>
+#else
+#include<stdbool.h>
+#include<stdio.h>
 #endif
 
+#define EAC_LIB_INIT \
+    static int lib_index = -1;\
+    static void* func = NULL;\
+    static int rev = 0;\
+    if(lib_index < 0) lib_index = EACLoad(EAC_LIB);
+
+#define EAC_LIB_MAYBE_RELOAD(func_str) \
+    if(EACGetRevision() > rev) {\
+        EACReload(lib_index);\
+        void* lib = EACGet(lib_index);\
+        func = dlsym(lib, func_str);\
+        rev = EACGetRevision();\
+    }
+
 #ifdef EAC_DEBUG
-#define EAC_FUNC(fhandle, ret, arg_names)\
+#define EAC_FUNC(fhandle, ret, arg_names) \
     {\
-        static void* lib = NULL;\
-        static void* func = NULL;\
-        static bool reload = true;\
-        if(reload) {\
-            if(lib) dlclose(lib);\
-            lib  = dlopen(EAC_LIB, 1);\
-            func = dlsym(lib, EAC_STR(fhandle##_export));\
-        }\
-        reload = false;\
+        EAC_LIB_INIT;\
+        if(!func) func = dlsym(EACGet(lib_index), EAC_STR(fhandle##_export));\
+        EAC_LIB_MAYBE_RELOAD(EAC_STR(fhandle##_export));\
         ret res = ((typeof(&fhandle))func)(arg_names);\
         return res;\
     }
-#define EAC_VOID_FUNC(fhandle, arg_names)\
+
+#define EAC_VOID_FUNC(fhandle, arg_names) \
     {\
-        static void* lib = NULL;\
-        static void* func = NULL;\
-        static bool reload = true;\
-        if(reload) {\
-            if(lib) dlclose(lib);\
-            lib  = dlopen(EAC_LIB, 1);\
-            func = dlsym(lib, EAC_STR(fhandle##_export));\
-        }\
-        reload = false;\
+        EAC_LIB_INIT;\
+        if(!func) func = dlsym(EACGet(lib_index), EAC_STR(fhandle##_export));\
+        EAC_LIB_MAYBE_RELOAD(EAC_STR(fhandle##_export));\
         ((typeof(&fhandle))func)(arg_names);\
         return;\
     }
-#define EAC_METHOD(cname, fname, ret, arg_names)\
-{\
-    static void* lib = NULL;\
-    static void* func = NULL;\
-    static bool reload = true;\
-    if(reload) {\
-        if(lib) dlclose(lib);\
-        lib  = dlopen(EAC_LIB, 1);\
-        func = dlsym(lib, EAC_STR(cname##_##fname##_export));\
-    }\
-    reload = false;\
-    ret res = ((typeof(&cname##_##fname##_export))func)(this /*,*/ arg_names);\
-    return res;\
-}
-#define EAC_VOID_METHOD(cname, fname, arg_names)\
-{\
-    static void* lib = NULL;\
-    static void* func = NULL;\
-    static bool reload = true;\
-    if(reload) {\
-        if(lib) dlclose(lib);\
-        lib  = dlopen(EAC_LIB, 1);\
-        func = dlsym(lib, EAC_STR(cname##_##fname##_export));\
-    }\
-    reload = false;\
-    ((typeof(&cname##_##fname##_export))func)(this /*,*/ arg_names);\
-    return;\
-}
+
+#define EAC_METHOD(cname, fname, ret, arg_names) \
+    {\
+        EAC_LIB_INIT;\
+        if(!func) func = dlsym(EACGet(lib_index), EAC_STR(cname##_##fname##_export));\
+        EAC_LIB_MAYBE_RELOAD(EAC_STR(cname##_##fname##_export));\
+        ret res = ((typeof(&cname##_##fname##_export))func)(this /*,*/ arg_names);\
+        return res;\
+    }
+
+#define EAC_VOID_METHOD(cname, fname, arg_names) \
+    {\
+        EAC_LIB_INIT;\
+        if(!func) func = dlsym(EACGet(lib_index), EAC_STR(cname##_##fname##_export));\
+        EAC_LIB_MAYBE_RELOAD(EAC_STR(cname##_##fname##_export));\
+        ((typeof(&cname##_##fname##_export))func)(this /*,*/ arg_names);\
+        return;\
+    }
 
 #else
 #define EAC_FUNC(fname, ret, arg_names)

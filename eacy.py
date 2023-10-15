@@ -1,11 +1,13 @@
 '''
 Copyright 2023 Matthew Peter Smith
 
-This code is provided under an MIT License. 
-See LICENSE.txt at the root of this Git repository. 
+This code is provided under an MIT License.
+See LICENSE.txt at the root of this Git repository.
 '''
 
 import gdb
+
+gdb.execute("set $eacy_rev = 0")
 
 class EACBreak(gdb.Command):
     def __init__(self):
@@ -64,6 +66,11 @@ class EACReload(gdb.Command):
         super(EACReload, self).__init__("eacreload", gdb.COMMAND_USER)
 
     def invoke(self, arg, from_tty):
-        gdb.execute("set reload = 1")
+        gdb.execute("set $eacy_rev = $eacy_rev + 1")
+        gdb.execute("eval \"shell rm -rf .eac.%d\", $eacy_rev")
+        gdb.execute("eval \"shell cp -r .eac .eac.%d\", $eacy_rev")
+        gdb.execute("call EACRevision($eacy_rev)")
+        # gdb.execute("set reload = 1")
+
 
 EACReload()

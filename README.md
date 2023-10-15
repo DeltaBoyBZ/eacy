@@ -30,10 +30,12 @@ have for elements,
 
     eacy.h
     eacy.cpp
+    load.h
+    load.cpp
     eacy.py
     eacy.vim
 
-a total of 642  significant  lines  of  code  (SLOC)  as  of
+a total of 573  significant  lines  of  code  (SLOC)  as  of
 writing. In contrast, a project such as
 [hscpp](https://github.com/jheruty/hscpp) contains over  9000
 SLOC, while its more popular inspiration  [Runtime  Compiled
@@ -144,12 +146,22 @@ then invoked by executing `:Termdebug`.
 
 ### TODO: Video
 
-## Design Shortcomings
+## Design Limitations
+
+As  of  writing,  the  main  limitation  would  seem  to  be
+EAC-y's failure to handle virtual methods. It is likely that
+they will have to be handled by a markedly different  system
+than regular methods.
+
+It is inconvenient, that a user program must be linked  with
+`libeacyload.so`, however this seems at present  to  be  the
+most elegant approach.  It allows us to  globally  flag  EAC
+components for reloading.
 
 This is an extremely young project.  There is hence much  to
-be desired with regard to the workflow  of  EAC-y.   A  full
-lamentation  can  be  found   in   the   [Design](design.md)
-document.
+be desired with regard to the workflow  of  EAC-y.   A  more
+complete lamentation  can  be  found   in   the
+[Design](design.md) document.
 
 ## Licensing
 

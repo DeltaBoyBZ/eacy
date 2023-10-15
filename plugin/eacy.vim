@@ -15,11 +15,12 @@ function! EACInit()
     function! EACRebuild()
         execute "normal! ?#define EAC_LIB\rwww\"ryi\""
         let libname = getreg('r')
-        execute "make " .. libname
+        execute "!mkdir -p .eac"
+        execute "make .eac/" .. libname
     endfunction
 
-    nnoremap <C-e> :call EACParse()<cr>
-    nnoremap <C-r> :call EACRebuild()<cr>
+    nnoremap <LocalLeader>ep :call EACParse()<cr>
+    nnoremap <LocalLeader>er :call EACRebuild()<cr>
 endfunction
 
 autocmd BufNewFile,BufReadPost *.c,*.cpp :call EACInit()
