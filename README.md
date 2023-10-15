@@ -127,11 +127,11 @@ hence comes with a very small Vim  plugin  which  interfaces
 with the `eacy` parser.  There are two important mappings in
 particular.
 
-- `<C-e>` - run `eacy` on the current buffer and replace
+- `<LocalLeader>ep` - run `eacy` on the current buffer and replace
     with the output. This can fail, so be sure that you can
     *undo*. 
 
-- `<C-r>` - runs `make` for the target named by `EAC_LIB` at 
+- `<LocalLeader>er` - runs `make` for the target named by `EAC_LIB` at 
   the source code position marked by the cursor.
 
 The recommended  workflow  involves  using  the  `Termdebug`
