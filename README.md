@@ -50,7 +50,7 @@ further insight than this.
 
 1. Build the `eacy` source parser: 
 
-        make eacy
+        make all
 
 2. Install everything to your system: 
 
