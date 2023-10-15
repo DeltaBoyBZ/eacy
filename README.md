@@ -15,7 +15,7 @@ code and rebuild, then continuing execution of  the  program
 with that new code. 
 
 The  reason  for  this  feature's  absence   is   its   high
-non-triviality of  implmentation.   In  the  Windows  world,
+non-triviality of  implementation.   In  the  Windows  world,
 Microsoft's Visual Studio has some  implementation  of  EAC.
 This  features  is  very  arguably  useful  for   e.g   game
 developers who need to squash bugs  which  are  hiding  deep
@@ -35,8 +35,8 @@ have for elements,
 
 a total of 642  significant  lines  of  code  (SLOC)  as  of
 writing. In contrast, a project such as
-[hscpp](https://github.com/jheruty/hscpp) containts over  9000
-SLOC, while its more popular inspriation  [Runtime  Compiled
+[hscpp](https://github.com/jheruty/hscpp) contains over  9000
+SLOC, while its more popular inspiration  [Runtime  Compiled
 C++](https://github.com/RuntimeCompiledCPlusPlus/RuntimeCompiledCPlusPlus)
 is comparable at its core. 
 
@@ -134,7 +134,7 @@ particular.
 
 The recommended  workflow  involves  using  the  `Termdebug`
 plugin for Vim.  This  is  made  available  by  placing  the
-folowing in your `.vimrc`,
+following in your `.vimrc`,
 
     packadd termdebug
 
