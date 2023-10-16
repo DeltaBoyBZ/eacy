@@ -245,6 +245,10 @@ void process_source(const char* source_filename)
         size_t args_close   = find_on_level(source, ")", args_open + 1);
         std::string args_str = source.substr(args_open + 1, args_close - args_open - 1);
 
+        if(args_str.find_first_not_of(" \t\n\r") 
+                != std::string::npos)
+            eac_prop |= EACY_HAS_ARGS;
+
         std::vector<size_t> commas; 
         find_all_on_level(source, ",", commas, args_open + 1); 
         commas.push_back(args_close); 
@@ -270,13 +274,6 @@ void process_source(const char* source_filename)
             arg_names_stream << arg_name;
         }
         std::string arg_names_str = arg_names_stream.str();
-        if(arg_names_str.find_first_not_of(" \t\n\r") == std::string::npos)
-        {
-            arg_names_str.assign("");
-        }
-
-        if(!arg_names_str.empty())
-            eac_prop |= EACY_HAS_ARGS;
 
         size_t body_start = find_on_level(source, "{", args_close + 1);
         size_t body_end   = find_on_level(source, "}", body_start + 1);
@@ -307,7 +304,6 @@ void process_source(const char* source_filename)
 
         if(!(eac_prop & EACY_IS_VOID))
             eac_func_stream << "EAC_WRAP(" << type_str << "), ";
-
         if((eac_prop & EACY_HAS_ARGS) && (eac_prop & EACY_IS_METHOD))
             eac_func_stream << "EAC_WRAP(, " << arg_names_str << "))";
         else if(eac_prop & EACY_HAS_ARGS)
@@ -349,6 +345,10 @@ void process_source(const char* source_filename)
         {
             eac_export_stream << "EAC_WRAP(, " << args_str << "), "
                 << "EAC_WRAP(" << arg_names_str << "))";
+        }
+        else if(eac_prop & EACY_IS_METHOD)
+        {
+            eac_export_stream << "EAC_WRAP(/**/), EAC_WRAP(/**/))";
         }
         else if(eac_prop & EACY_HAS_ARGS)
             eac_export_stream << "EAC_WRAP(" << args_str << "), "
